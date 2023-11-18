@@ -187,6 +187,7 @@ public class prompt {
             System.out.println("4. ZIP 모델 압축해제 ( Model Unzip toolkit )");
             System.out.println("5. ONNX 기반 모델 다운로더 ( ONNX Model Downloader )");
             System.out.println("6. 프로그램 종료 ( Exit Program )");
+            System.out.println("7. 개발자 깃허브 보기 ( Show Developer Github )");
             System.out.println("----------------------");
             System.out.print("메뉴를 선택하세요 : ");
             int value = sc.nextInt();
@@ -330,6 +331,20 @@ public class prompt {
 //                    프로그램 종료
                     System.out.println("Exit Program");
                     isexit = true;
+                }
+                case 7 -> {
+                    System.out.println("----- Developer Github -----");
+                    System.out.println("Developer : Layla-Focalors");
+                    System.out.println("https://github.com/layla-focalors");
+                    System.out.println("Ascii ARTS");
+                    System.out.println("" +
+                            "  ###       ##     ##  ##   ####       ##              #######   #####     ####     ##     ####      #####   ######    #####\n" +
+                            "   ##      ####    ##  ##    ##       ####              ##   #  ##   ##   ##  ##   ####     ##      ##   ##   ##  ##  ##   ##\n" +
+                            "   ##     ##  ##   ##  ##    ##      ##  ##             ## #    ##   ##  ##       ##  ##    ##      ##   ##   ##  ##  #\n" +
+                            "   ##     ##  ##    ####     ##      ##  ##   ######    ####    ##   ##  ##       ##  ##    ##      ##   ##   #####    #####\n" +
+                            "   ##     ######     ##      ##   #  ######             ## #    ##   ##  ##       ######    ##   #  ##   ##   ## ##        ##\n" +
+                            "   ##     ##  ##     ##      ##  ##  ##  ##             ##      ##   ##   ##  ##  ##  ##    ##  ##  ##   ##   ##  ##  ##   ##\n" +
+                            "  ####    ##  ##    ####    #######  ##  ##            ####      #####     ####   ##  ##   #######   #####   #### ##   #####");
                 }
                 case 1229 -> {
                     System.out.println("----- Test -----");
