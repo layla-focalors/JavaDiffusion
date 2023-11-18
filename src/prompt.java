@@ -10,7 +10,38 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.io.InputStreamReader;
-class JythonMX {
+import java.io.File;import java.io.IOException;
+
+class IsFiles {
+    public static void IsExists(String Filename){
+        String filePath = "./data/is" + Filename + ".txt";
+        File file = new File(Filename);
+        if(file.exists()){
+            System.out.println("파일이 존재합니다.");
+        }else {
+            System.out.println("파일이 존재하지 않습니다.");
+        }
+    }
+}
+
+class GEN_TXT {
+    public static void TextGen(String log){
+        try {
+            String filePath = "./data/is" + log + ".txt";
+            File file = new File(filePath);
+            try {
+                file.createNewFile();
+            } catch (Exception e) {
+                System.out.println("파일 생성에 오류가 발생했습니다.");
+            }
+        } catch (Exception e) {
+            System.out.println("파일 생성에 실패했습니다.");
+            e.printStackTrace();
+        }
+    }
+}
+
+class JythonMX extends GEN_TXT {
     public static void JythonInstaller(){
         try {
             System.out.println("------ Jython Installer -----");
@@ -18,7 +49,7 @@ class JythonMX {
             System.out.println("설치되는 파일이 궁금하시다면, Assets/JythonInstaller ... .jar 파일을 참고하세요");
             System.out.println("Jython 파일은 Assets 폴더에 저장되며, 이 파일은 추후에 삭제하셔도 무방합니다.");
             System.out.println("경고: 해당 파일은 직접 설치해주셔야 하며, 기본 설정은 변경하지 마십시오.");
-            ProcessBuilder pbs = new ProcessBuilder("cmd.exe", "/c", "java -jar Assets/jython-installer-2.7.2.jar");
+            ProcessBuilder pbs = new ProcessBuilder("cmd.exe", "/c", "java -jar Assets/jython-installer-2.7.3.jar");
             Process ps = pbs.start();
             BufferedReader readers = new BufferedReader(new InputStreamReader(ps.getInputStream()));
             String lines;
@@ -26,6 +57,8 @@ class JythonMX {
                 System.out.println(lines);
             }
             ps.waitFor();
+            TextGen("Jython");
+            System.out.println("Jython 설치가 완료되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -218,7 +251,26 @@ public class prompt {
                 }
                 case 2 -> {
 //                    이미지 생성 : stable diffusion loader
-                    System.out.println("Create Image");
+                    System.out.println("----- Image Generator -----");
+                    System.out.println("이미지 생성을 위해 다음의 답변에 답해주세요!");
+                    System.out.print("이미지 생성을 Java Models 를 통해 진행하시겠습니까? (yes/no) : ");
+                    Scanner scu = new Scanner(System.in);
+                    String corex = scu.nextLine();
+                    if(corex.equals("yes")){
+
+                    }else if(corex.equals("no")){
+                        System.out.print("디바이스에 Jython FrameWork가 설치되어 있습니까? (yes/no) : ");
+                        String nxxp = scu.nextLine();
+                        if(nxxp.equals("no")){
+                            System.out.println("Jython 설치로 이동합니다.");
+                            JythonMX jmx = new JythonMX();
+                            jmx.JythonInstaller();
+                        }else if(nxxp.equals("yes")) {
+
+                        }
+                    }else {
+                        System.out.println("알 수 없는 요청입니다. ( Unknown Request )");
+                    }
                 }
                 case 3 -> {
                   System.out.println("----- Model Downloader -----");
