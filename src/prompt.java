@@ -1,3 +1,5 @@
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,6 +13,18 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.io.InputStreamReader;
 import java.io.File;import java.io.IOException;
+
+class Diffusion {
+    public static void Diffusion(String prompt, int batch_size){
+        TextParser(prompt);
+    }
+    private static void TextParser(String prompt){
+        System.out.println(prompt);
+    }
+    private static void ImgSave(String img_name){
+        String DefaultPath = "./output/" + img_name;
+    };
+}
 
 class IsFiles {
     public static boolean IsExists(String Filename){
@@ -268,7 +282,16 @@ public class prompt {
                     Scanner scu = new Scanner(System.in);
                     String corex = scu.nextLine();
                     if(corex.equals("yes")){
-
+                        System.out.println("---- JVM Generator -----");
+                        System.out.println("필요한 입력값을 입력해주세요! ");
+                        Scanner scxp = new Scanner(System.in);
+                        System.out.print("이미지의 배치 사이즈를 입력하세요 : ");
+                        int batch_size = scxp.nextInt();
+                        System.out.print("이미지의 프롬프트를 입력하세요 : ");
+                        Scanner osc = new Scanner(System.in);
+                        String prompt = osc.nextLine();
+                        Diffusion dif = new Diffusion();
+                        dif.Diffusion(prompt, batch_size);
                     }else if(corex.equals("no")){
                         IsFiles isf = new IsFiles();
                         if(isf.IsExists("Jython")){
