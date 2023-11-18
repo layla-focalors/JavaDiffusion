@@ -1,3 +1,4 @@
+import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.w3c.dom.Text;
 
 import java.awt.image.BufferedImage;
@@ -58,6 +59,10 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.impl.ActivationLReLU;
 import org.nd4j.linalg.activations.impl.ActivationRReLU;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
+import org.deeplearning4j.nn.conf.graph.ElementWiseVertex;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import org.nd4j.linalg.activations.impl.ActivationRReLU;
 
 class CycleGAN_options {
     int width;
@@ -282,6 +287,25 @@ class CycleGAN{
         }
         return null;
     }
+
+    private static void resney_block(int n_filters, String input_layer, GraphBuilder graph){
+        WeightInit weightInit = RandomNormal(0.02f);
+
+        // 첫 번째 컨볼루션 레이어
+        ConvolutionLayer conv1 = Conv2D(n_filters, 1, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation1 = LReLU(0.2);
+
+        // 두 번째 컨볼루션 레이어
+        ConvolutionLayer conv2 = Conv2D(n_filters, 1, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+
+        // 입력 레이어와 채널 방향으로 병합
+        graph.addLayer("conv1", conv1, input_layer)
+                .addVertex("activation1", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv1")
+                .addLayer("conv2", conv2, "activation1")
+                .addVertex("merge", new MergeVertex(), "conv2", input_layer);
+        }
 //    1def define_discriminator(image_shape):
 //	# weight initialization
 //	1init = RandomNormal(stddev=0.02)
