@@ -9,6 +9,55 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.io.InputStreamReader;
+
+class Pydownloader {
+    public static void pyloader(String model_git, String model_name){
+        try {
+            ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "pip install optimum[\"onnxruntime\"]");
+            Process p = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            p.waitFor();
+            ProcessBuilder pbs = new ProcessBuilder("cmd.exe", "/c", "pip install transformers");
+            Process ps = pbs.start();
+            BufferedReader readers = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+            String lines;
+            while ((lines = reader.readLine()) != null) {
+                System.out.println(lines);
+            }
+            p.waitFor();
+            ProcessBuilder pbss = new ProcessBuilder("cmd.exe", "/c", "optimum-cli export onnx --model %s %s/".format(model_git, model_name));
+            Process pss = pbss.start();
+            BufferedReader readerss = new BufferedReader(new InputStreamReader(pss.getInputStream()));
+            String liness;
+            while ((liness = reader.readLine()) != null) {
+                System.out.println(liness);
+            }
+            p.waitFor();
+            Path sourcePath = Paths.get("./" + model_name);
+            Path targetPath = Paths.get("./model");
+            try {
+//                파일 이동
+                Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("파일이 성공적으로 복사되었습니다.");
+            } catch (Exception e) {
+                System.out.println("파일 복사에 실패하였습니다.");
+                System.out.println("에러 401: 권한이 부족하여 파일을 복사하지 못했습니다.");
+                System.out.println("혹은 파일이 이미 존재하고 있어, 파일을 복사하지 못했습니다.");
+            }
+            finally {
+                System.out.println("Running Next process");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
 class CopyUnzipEngine {
     public static void AddUnzip(){
         System.out.println("----- Unzip Engine -----");
@@ -182,6 +231,13 @@ public class prompt {
                     System.out.println("경고 : 해당 모델 다운로더 시스템은 파이썬이 존재할 경우에만 동작합니다.");
                     System.out.println("해당 명령이 동작하지 않을 경우, 파이썬의 인터프리터 & pip이 설치되어 있는지 확인하세요.");
                     System.out.println("파이썬이 설치되어 있지 않다면, https://www.python.org/downloads/ 에서 파이썬을 설치하세요.");
+                    Pydownloader pdl = new Pydownloader();
+                    Scanner px = new Scanner(System.in);
+                    System.out.print("다운로드할 모델의 허깅페이스 허브 주소를 입력하세요 : ");
+                    String model_name_git = px.nextLine();
+                    System.out.println("다운로드할 모델의 이름를 입력하세요 : ");
+                    String model_name = px.nextLine();
+                    pdl.pyloader(model_name_git,model_name);
                 }
                 case 6 -> {
 //                    프로그램 종료
