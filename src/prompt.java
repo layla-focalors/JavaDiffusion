@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.File;import java.io.IOException;
 
 class Diffusion {
+//    안될 것 같으면 CycleGAN으로 선회
     public static void Diffusion(String prompt, int batch_size){
         TextParser(prompt);
     }
@@ -276,34 +277,46 @@ public class prompt {
                 }
                 case 2 -> {
 //                    이미지 생성 : stable diffusion loader
+//                    CHANGED : CycleGAN도 추가
                     System.out.println("----- Image Generator -----");
-                    System.out.println("이미지 생성을 위해 다음의 답변에 답해주세요!");
-                    System.out.print("이미지 생성을 Java Models 를 통해 진행하시겠습니까? (yes/no) : ");
-                    Scanner scu = new Scanner(System.in);
-                    String corex = scu.nextLine();
-                    if(corex.equals("yes")){
-                        System.out.println("---- JVM Generator -----");
-                        System.out.println("필요한 입력값을 입력해주세요! ");
-                        Scanner scxp = new Scanner(System.in);
-                        System.out.print("이미지의 배치 사이즈를 입력하세요 : ");
-                        int batch_size = scxp.nextInt();
-                        System.out.print("이미지의 프롬프트를 입력하세요 : ");
-                        Scanner osc = new Scanner(System.in);
-                        String prompt = osc.nextLine();
-                        Diffusion dif = new Diffusion();
-                        dif.Diffusion(prompt, batch_size);
-                    }else if(corex.equals("no")){
-                        IsFiles isf = new IsFiles();
-                        if(isf.IsExists("Jython")){
-                            System.out.println("Jython FrameWork가 설치되어 있습니다.");
+                    Scanner cmk = new Scanner(System.in);
+                    System.out.println("1. CycleGAN");
+                    System.out.println("2. JVM - StableDiffusion");
+                    System.out.print("모델을 선택해주세요! : ");
+                    int valuesx = cmk.nextInt();
+                    if(valuesx == 1){
+
+                    }else if(valuesx == 2){
+                        System.out.println("이미지 생성을 위해 다음의 답변에 답해주세요!");
+                        System.out.print("이미지 생성을 Java Models 를 통해 진행하시겠습니까? (yes/no) : ");
+                        Scanner scu = new Scanner(System.in);
+                        String corex = scu.nextLine();
+                        if(corex.equals("yes")){
+                            System.out.println("---- JVM Generator -----");
+                            System.out.println("필요한 입력값을 입력해주세요! ");
+                            Scanner scxp = new Scanner(System.in);
+                            System.out.print("이미지의 배치 사이즈를 입력하세요 : ");
+                            int batch_size = scxp.nextInt();
+                            System.out.print("이미지의 프롬프트를 입력하세요 : ");
+                            Scanner osc = new Scanner(System.in);
+                            String prompt = osc.nextLine();
+                            Diffusion dif = new Diffusion();
+                            dif.Diffusion(prompt, batch_size);
+                        }else if(corex.equals("no")){
+                            IsFiles isf = new IsFiles();
+                            if(isf.IsExists("Jython")){
+                                System.out.println("Jython FrameWork가 설치되어 있습니다.");
+                            }else {
+                                System.out.println("Jython FrameWork가 설치되어 있지 않습니다.");
+                                System.out.println("Jython FrameWork를 설치합니다.");
+                                JythonMX jmx = new JythonMX();
+                                jmx.JythonInstaller();
+                            }
                         }else {
-                            System.out.println("Jython FrameWork가 설치되어 있지 않습니다.");
-                            System.out.println("Jython FrameWork를 설치합니다.");
-                            JythonMX jmx = new JythonMX();
-                            jmx.JythonInstaller();
+                            System.out.println("알 수 없는 요청입니다. ( Unknown Request )");
                         }
                     }else {
-                        System.out.println("알 수 없는 요청입니다. ( Unknown Request )");
+                        System.out.println("Unknown Request");
                     }
                 }
                 case 3 -> {
