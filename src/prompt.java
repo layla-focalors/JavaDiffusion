@@ -5,16 +5,12 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.graph.ElementWiseVertex;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.BatchNormalization;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.conf.layers.*;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.activations.impl.ActivationLReLU;
-import org.nd4j.linalg.activations.impl.ActivationRReLU;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -316,14 +312,14 @@ class CycleGAN{
         }
 
         // u128
-        Deconvolution2D deconv1 = Deconv2D(128, 2, 1);
+        SubsamplingLayer deconv1 = new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX, new int[]{2, 2}).build();
         ActivationLReLU activation4 = LReLU(0.2);
 
         graph.addLayer("deconv1", deconv1, lastLayerId)
                 .addVertex("activation4", new ElementWiseVertex(ElementWiseVertex.Op.Add), "deconv1");
 
         // u64
-        Deconvolution2D deconv2 = Deconv2D(64, 2, 1);
+        SubsamplingLayer deconv2 = new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX, new int[]{2, 2}).build();
         ActivationLReLU activation5 = LReLU(0.2);
 
         graph.addLayer("deconv2", deconv2, "activation4")
