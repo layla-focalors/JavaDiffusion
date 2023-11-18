@@ -13,21 +13,23 @@ import java.io.InputStreamReader;
 import java.io.File;import java.io.IOException;
 
 class IsFiles {
-    public static void IsExists(String Filename){
-        Searcher(Filename);
+    public static boolean IsExists(String Filename){
+        return Searcher(Filename);
     }
-    static void IsExits2(String Filename){
-        Searcher(Filename);
+    static boolean IsExits2(String Filename){
+        return Searcher(Filename);
     }
 
-    private static void Searcher(String Filename) {
+    private static boolean Searcher(String Filename) {
         String filePath = "./data/is" + Filename + ".txt";
         System.out.println("파일 경로 : " + filePath);
         File file = new File(filePath);  // 파일의 전체 경로를 사용합니다.
         if(file.exists()){
             System.out.println("파일이 존재합니다.");
+            return true;
         }else {
             System.out.println("파일이 존재하지 않습니다.");
+            return false;
         }
     }
 }
@@ -267,14 +269,14 @@ public class prompt {
                     if(corex.equals("yes")){
 
                     }else if(corex.equals("no")){
-                        System.out.print("디바이스에 Jython FrameWork가 설치되어 있습니까? (yes/no) : ");
-                        String nxxp = scu.nextLine();
-                        if(nxxp.equals("no")){
-                            System.out.println("Jython 설치로 이동합니다.");
+                        IsFiles isf = new IsFiles();
+                        if(isf.IsExists("Jython")){
+                            System.out.println("Jython FrameWork가 설치되어 있습니다.");
+                        }else {
+                            System.out.println("Jython FrameWork가 설치되어 있지 않습니다.");
+                            System.out.println("Jython FrameWork를 설치합니다.");
                             JythonMX jmx = new JythonMX();
                             jmx.JythonInstaller();
-                        }else if(nxxp.equals("yes")) {
-
                         }
                     }else {
                         System.out.println("알 수 없는 요청입니다. ( Unknown Request )");
@@ -342,7 +344,7 @@ public class prompt {
                             System.out.print("파일이 존재하는지 확인할 파일의 이름을 입력하세요 : ");
                             Scanner ucx = new Scanner(System.in);
                             String test_name = ucx.nextLine();
-                            isf.IsExists(test_name);
+                            System.out.println(isf.IsExists(test_name));
                         }
                         default -> {
                             System.out.println("잘못된 입력입니다. ( Wrong Input )");
