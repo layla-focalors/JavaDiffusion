@@ -15,7 +15,7 @@ public class prompt {
         boolean isexit = false;
 //        모델 이름과 주소 저장
         String model_Name;
-        String fileURL = "https://github.com/layla-focalors/JavaDiffusion/models/";
+        String fileURL = "https://github.com/layla-focalors/JavaDiffusion/blob/main/models/";
 //        isexit 객체를 사용해 프로그램의 종료 여부를 판단
         Scanner sc = new Scanner(System.in);
 //        sc를 통해 스캐너 객체 생성
@@ -107,7 +107,21 @@ public class prompt {
                   Scanner models = new Scanner(System.in);
                   System.out.println("!TIP : 모델은 model 폴더에 저장됩니다.");
                   System.out.print("다운로드 할 모델의 이름을 입력하세요 : ");
+                  String saveFilePath = "./model";
                   model_Name = models.nextLine();
+                  System.out.println("다운로드할 모델 경로 : " + fileURL + model_Name);
+                  try {
+                      URL url = new URL(fileURL + model_Name);
+                      try {
+                            InputStream in = url.openStream();
+                            Files.copy(in, Path.of(saveFilePath + "/" + model_Name), StandardCopyOption.REPLACE_EXISTING);
+                            System.out.println("모델 다운로드가 완료되었습니다. ( Download Model Complete )");
+                        } catch (Exception e) {
+                            System.out.println("모델 다운로드에 실패하였습니다. ( Download Model Failed )");
+                      }
+                  } catch (Exception e) {
+                      System.out.println("모델을 찾을 수 없습니다. ( Can't Find Model )");
+                  }
 
                 }
                 case 4 -> {
