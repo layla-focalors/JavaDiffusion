@@ -20,6 +20,31 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 import javax.imageio.ImageIO;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.activations.impl.ActivationLReLU;
+import org.deeplearning4j.nn.conf.layers.BatchNormalization;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.Updater;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.learning.config.Nesterovs;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
+
 
 class CycleGAN_options {
     int width;
@@ -58,6 +83,21 @@ class CycleGAN_options {
     }
 }
 
+class Models {
+    public static MultiLayerNetwork Model_Compile(float learning_late, float beta1){
+        MultiLayerNetwork model = new MultiLayerNetwork(new NeuralNetConfiguration.Builder()
+                .weightInit(WeightInit.XAVIER)
+                .activation(Activation.RELU)
+                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+                .updater(new Nesterovs(learning_late, beta1))
+                .list()
+                .layer(0, new DenseLayer.Builder().nIn(10).nOut(10).build())
+                .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.MSE).nIn(10).nOut(10).build())
+                .build());
+        model.init();
+        return model;
+    }
+}
 
 class CycleGAN_GetDataset {
     public static void CycleGAN_GetDataset(String dataset_name, String data_type){
@@ -76,6 +116,41 @@ class CycleGAN_GetDataset {
             }
         }
         System.out.println(images);
+    }
+}
+
+class InstanceNormalization{
+    public static BatchNormalization InstanceNormalization_Layer(int image_channels){
+        System.out.println("InstanceNormalization");
+        BatchNormalization InstanceNormalizations_layer = new BatchNormalization.Builder()
+                .nIn(image_channels) // 이전 레이어의 출력 뉴런 수 또는 입력 채널 수
+                .nOut(image_channels) // 출력 뉴런 수. 인스턴스 정규화는 채널 당 독립적으로 작동하므로, 출력 뉴런 수는 입력 채널 수와 동일
+                .build();
+        return InstanceNormalizations_layer;
+    }
+}
+
+class Model_Activation {
+    static ActivationLReLU LReLU(double alpha){
+        System.out.println("LReLU");
+        return new ActivationLReLU(alpha);
+    }
+}
+
+class Convolutions {
+//    (64, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(in_image)
+    public static ConvolutionLayer Conv2D(int filters, int strides, int padding){
+        System.out.println("Conv2D");
+//        Nchannels ( RGB = 3, GrayScale = 1 )
+        ConvolutionLayer layer = new ConvolutionLayer.Builder()
+                .nIn(3) // 이전 레이어의 출력 뉴런 수 또는 입력 채널 수
+                .nOut(filters) // 필터의 수
+                .stride(strides, strides) // 스트라이드
+                .padding(padding, padding) // 패딩. 'same'은 입력과 출력의 크기를 동일하게 유지하므로 패딩을 1로 설정
+                .weightInit(WeightInit.RELU) // 가중치 초기화. Keras의 'init'에 해당
+                .activation(Activation.LEAKYRELU) // 활성화 함수.
+                .build();
+        return layer;
     }
 }
 
