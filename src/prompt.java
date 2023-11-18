@@ -96,26 +96,81 @@ class CycleGAN{
 
         File dir = new File("./public_dataset/" + dataset_name + "/" + data_type + "/");
         File[] files = dir.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png")); // .jpg 또는 .png 확장자를 가진 파일만 선택
-        List<BufferedImage> images = new ArrayList<>();
+        List<BufferedImage> TrainA = new ArrayList<>();
 
         if (files != null) {
             for (File file : files) {
                 try {
                     BufferedImage img = ImageIO.read(file);
-                    images.add(img);
+                    TrainA.add(img);
                 } catch (IOException e) {
                     System.out.println("이미지 로드에 실패하였습니다.");
                 }
             }
         }
-        System.out.println(images.get(10));
-        BufferedImage fx = images.get(10);
-        try {
-            File outputfile = new File("saved.png");
-            ImageIO.write(fx, "png", outputfile);
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
+        data_type = "trainB";
+        File dirs = new File("./public_dataset/" + dataset_name + "/" + data_type + "/");
+        File[] filess = dirs.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png")); // .jpg 또는 .png 확장자를 가진 파일만 선택
+        List<BufferedImage> TrainB = new ArrayList<>();
+
+        if (filess != null) {
+            for (File file : filess) {
+                try {
+                    BufferedImage img = ImageIO.read(file);
+                    TrainB.add(img);
+                } catch (IOException e) {
+                    System.out.println("이미지 로드에 실패하였습니다.");
+                }
+            }
         }
+        data_type = "testA";
+        dirs = new File("./public_dataset/" + dataset_name + "/" + data_type + "/");
+        File[] filessx = dirs.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png")); // .jpg 또는 .png 확장자를 가진 파일만 선택
+        List<BufferedImage> testA = new ArrayList<>();
+
+        if (filessx != null) {
+            for (File file : filessx) {
+                try {
+                    BufferedImage img = ImageIO.read(file);
+                    testA.add(img);
+                } catch (IOException e) {
+                    System.out.println("이미지 로드에 실패하였습니다.");
+                }
+            }
+        }
+        data_type = "testB";
+        dirs = new File("./public_dataset/" + dataset_name + "/" + data_type + "/");
+        File[] filessxt = dirs.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png")); // .jpg 또는 .png 확장자를 가진 파일만 선택
+        List<BufferedImage> testB = new ArrayList<>();
+
+        if (filessxt != null) {
+            for (File file : filessxt) {
+                try {
+                    BufferedImage img = ImageIO.read(file);
+                    testB.add(img);
+                } catch (IOException e) {
+                    System.out.println("이미지 로드에 실패하였습니다.");
+                }
+            }
+        }
+//        CHECKPOINT
+//        System.out.println(TrainB.get(20));
+//        BufferedImage fx = TrainB.get(20);
+//        try {
+//            File outputfile = new File("saved-B.png");
+//            ImageIO.write(fx, "png", outputfile);
+//        } catch (IOException e) {
+//            System.out.println("Error: " + e);
+//        }
+//        System.out.println(TrainB.get(20));
+//        BufferedImage fxx = TrainA.get(20);
+//        try {
+//            File outputfile = new File("saved-A.png");
+//            ImageIO.write(fxx, "png", outputfile);
+//        } catch (IOException e) {
+//            System.out.println("Error: " + e);
+//        }
+
     }
     private static void getLoader(String dataset_name, String data_type){
         System.out.println("------ CycleGAN_getLoader -----");
