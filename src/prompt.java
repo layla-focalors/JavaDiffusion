@@ -10,6 +10,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.io.InputStreamReader;
+class JythonMX {
+    public static void JythonInstaller(){
+        try {
+            System.out.println("------ Jython Installer -----");
+            System.out.println("이 과정은 Jython FrameWork 를 설치합니다.");
+            System.out.println("설치되는 파일이 궁금하시다면, Assets/JythonInstaller ... .jar 파일을 참고하세요");
+            System.out.println("Jython 파일은 Assets 폴더에 저장되며, 이 파일은 추후에 삭제하셔도 무방합니다.");
+            System.out.println("경고: 해당 파일은 직접 설치해주셔야 하며, 기본 설정은 변경하지 마십시오.");
+            ProcessBuilder pbs = new ProcessBuilder("cmd.exe", "/c", "java -jar Assets/jython-installer-2.7.2.jar");
+            Process ps = pbs.start();
+            BufferedReader readers = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+            String lines;
+            while ((lines = readers.readLine()) != null) {
+                System.out.println(lines);
+            }
+            ps.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class ONNX_loader extends Pydownloader {
+
+}
 
 class Pydownloader {
     public static void pyloader(String model_git, String model_name){
@@ -26,18 +51,18 @@ class Pydownloader {
             Process ps = pbs.start();
             BufferedReader readers = new BufferedReader(new InputStreamReader(ps.getInputStream()));
             String lines;
-            while ((lines = reader.readLine()) != null) {
+            while ((lines = readers.readLine()) != null) {
                 System.out.println(lines);
             }
-            p.waitFor();
+            ps.waitFor();
             ProcessBuilder pbss = new ProcessBuilder("cmd.exe", "/c", "optimum-cli export onnx --model %s %s/".format(model_git, model_name));
             Process pss = pbss.start();
             BufferedReader readerss = new BufferedReader(new InputStreamReader(pss.getInputStream()));
             String liness;
-            while ((liness = reader.readLine()) != null) {
+            while ((liness = readerss.readLine()) != null) {
                 System.out.println(liness);
             }
-            p.waitFor();
+            pss.waitFor();
             Path sourcePath = Paths.get("./" + model_name);
             Path targetPath = Paths.get("./model");
             try {
