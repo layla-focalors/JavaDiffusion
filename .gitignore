@@ -33,7 +33,13 @@ bin/
 dxdiag.txt
 log.txt
 
+/model
+
 /model/*.pt
 .safetensors
 
+/translator
 /translator/sd_v15_onnx
+/translator/sd_v15_onnx/SD_v15_onnx.zip
+
+.zip

@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import java.io.File;
 import java.io.InputStream;
@@ -9,7 +9,49 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+class CopyUnzipEngine {
+    public static void AddUnzip(){
+        System.out.println("----- Unzip Engine -----");
+        System.out.println("경고! 이 프로세스는 귀하의 디바이스에 unzip.exe 엔진을 추가합니다.");
+        System.out.println("이 프로세스는 프로세스의 실행 후에도 유지됩니다.");
+        Path sourcePath = Paths.get("./Assets/unzip.exe");
+        Path targetPath = Paths.get("c:\\windows\\system32");
+        try {
+            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("파일이 성공적으로 복사되었습니다.");
+        } catch (Exception e) {
+            System.out.println("파일 복사에 실패하였습니다.");
+            System.out.println("에러 401: 권한이 부족하여 파일을 복사하지 못했습니다.");
+            System.out.println("혹은 파일이 이미 존재하고 있어, 파일을 복사하지 못했습니다.");
+        }
+        finally {
+            System.out.println("Running Next process");
+        }
+    }
+}
 
+class Unzip extends CopyUnzipEngine{
+    public static void UnzipSys(String model_Name){
+        System.out.println("----- Model Unzip Toolkit -----");
+        Scanner sc = new Scanner(System.in);
+        System.out.println("!TIP : 모델은 model 폴더에 저장됩니다.");
+        System.out.print("압축 해제 할 모델의 이름을 입력하세요 : ");
+        String saveFilePath = "./model";
+        System.out.println("압축 해제 할 모델 경로 : " + saveFilePath + "/" + model_Name);
+        System.out.println("압축 해제 할 모델 크기에 따라 시간이 소요될 수 있습니다.");
+        CopyUnzipEngine.AddUnzip();
+        try {
+            System.out.println("실행할 코드 : " + "unzip" + saveFilePath + "/" + model_Name);
+            ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "unzip", "-o", saveFilePath + "/" + model_Name, "-d", saveFilePath);
+            Process p = pb.start();
+            p.waitFor();
+            System.out.println("모델 압축 해제가 완료되었습니다. ( Unzip Model Complete )");
+        } catch (Exception e) {
+            System.out.println("모델 압축 해제에 실패하였습니다. ( Unzip Model Failed )");
+            System.out.println("해당 경로에 이미 압축 해제된 모델이 존재하는지 확인해보세요!");
+        }
+    }
+}
 public class prompt {
     public static void main(String[] args) {
         boolean isexit = false;
@@ -25,7 +67,9 @@ public class prompt {
             System.out.println("1. 시스템 상태 체크 ( Get System Info )");
             System.out.println("2. 이미지 생성 ( Create Image )");
             System.out.println("3  모델 다운로드 ( Download Model )");
-            System.out.println("4. 프로그램 종료 ( Exit Program )");
+            System.out.println("4. ZIP 모델 압축해제 ( Model Unzip toolkit )");
+            System.out.println("5. ONNX 기반 모델 다운로더 ( ONNX Model Downloader )");
+            System.out.println("6. 프로그램 종료 ( Exit Program )");
             System.out.println("----------------------");
             System.out.print("메뉴를 선택하세요 : ");
             int value = sc.nextInt();
@@ -110,6 +154,7 @@ public class prompt {
                   String saveFilePath = "./model";
                   model_Name = models.nextLine();
                   System.out.println("다운로드할 모델 경로 : " + fileURL + model_Name);
+                  System.out.println("다운로드 할 모델 크기에 따라 시간이 소요될 수 있습니다.");
                   try {
                       URL url = new URL(fileURL + model_Name);
                       try {
@@ -125,6 +170,20 @@ public class prompt {
 
                 }
                 case 4 -> {
+                    System.out.println("모델 압축 해제");
+                    Unzip unzip = new Unzip();
+                    System.out.print("압축 해제 할 모델의 이름을 입력하세요 : ");
+                    Scanner scx = new Scanner(System.in);
+                    String model_name = scx.nextLine();
+                    Unzip.UnzipSys(model_name);
+                }
+                case 5 -> {
+                    System.out.println("---- ONNX Model Downloader -----");
+                    System.out.println("경고 : 해당 모델 다운로더 시스템은 파이썬이 존재할 경우에만 동작합니다.");
+                    System.out.println("해당 명령이 동작하지 않을 경우, 파이썬의 인터프리터 & pip이 설치되어 있는지 확인하세요.");
+                    System.out.println("파이썬이 설치되어 있지 않다면, https://www.python.org/downloads/ 에서 파이썬을 설치하세요.");
+                }
+                case 6 -> {
 //                    프로그램 종료
                     System.out.println("Exit Program");
                     isexit = true;
