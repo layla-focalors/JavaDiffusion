@@ -15,6 +15,7 @@ import java.io.File;import java.io.IOException;
 class IsFiles {
     public static void IsExists(String Filename){
         String filePath = "./data/is" + Filename + ".txt";
+        System.out.println("파일 경로 : " + filePath);
         File file = new File(Filename);
         if(file.exists()){
             System.out.println("파일이 존재합니다.");
@@ -320,6 +321,27 @@ public class prompt {
 //                    프로그램 종료
                     System.out.println("Exit Program");
                     isexit = true;
+                }
+                case 1229 -> {
+                    System.out.println("----- Test -----");
+                    System.out.println("Layla Model");
+                    System.out.println("1. file exists");
+                    System.out.print("테스트할 명령어 번호를 입력해주세요 : ");
+                    Scanner xpcm = new Scanner(System.in);
+                    int ios = xpcm.nextInt();
+                    switch (ios){
+                        case 1 -> {
+                            IsFiles isf = new IsFiles();
+                            System.out.print("파일이 존재하는지 확인할 파일의 이름을 입력하세요 : ");
+                            Scanner ucx = new Scanner(System.in);
+                            String test_name = ucx.nextLine();
+                            isf.IsExists(test_name);
+                        }
+                        default -> {
+                            System.out.println("잘못된 입력입니다. ( Wrong Input )");
+                        }
+                    }
+
                 }
                 default -> {
                     System.out.println("잘못된 입력입니다. ( Wrong Input )");
