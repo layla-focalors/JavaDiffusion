@@ -11,6 +11,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.activations.impl.ActivationLReLU;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -282,7 +283,6 @@ class CycleGAN{
 
         // 첫 번째 컨볼루션 레이어
         ConvolutionLayer conv1 = Conv2D(64, 1, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation1 = LReLU(0.2);
 
         graph.addLayer("conv1", conv1, "input")
@@ -290,7 +290,6 @@ class CycleGAN{
 
         // d128
         ConvolutionLayer conv2 = Conv2D(128, 2, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation2 = LReLU(0.2);
 
         graph.addLayer("conv2", conv2, "activation1")
@@ -298,7 +297,6 @@ class CycleGAN{
 
         // d256
         ConvolutionLayer conv3 = Conv2D(256, 2, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation3 = LReLU(0.2);
 
         graph.addLayer("conv3", conv3, "activation2")
@@ -327,7 +325,6 @@ class CycleGAN{
 
         // 마지막 컨볼루션 레이어
         ConvolutionLayer conv4 = Conv2D(3, 1, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation6 = LReLU(0.2);
 
         graph.addLayer("conv4", conv4, "activation5")
@@ -354,6 +351,47 @@ class CycleGAN{
         }
         return null;
     }
+
+    private static ComputationGraph define_composite_model(ComputationGraph g_model_1, ComputationGraph d_model, ComputationGraph g_model_2, int width, int height, int channels) {
+        g_model_1.getConfiguration().setPretrain(true);
+        d_model.getConfiguration().setPretrain(false);
+        g_model_2.getConfiguration().setPretrain(false);
+
+        INDArray input_gen = Nd4j.rand(new int[]{1, channels, width, height}); // 임의의 입력 데이터
+        INDArray gen1_out = g_model_1.outputSingle(input_gen);
+        INDArray output_d = d_model.outputSingle(gen1_out);
+
+        INDArray input_id = Nd4j.rand(new int[]{1, channels, width, height}); // 임의의 입력 데이터
+        INDArray output_id = g_model_1.outputSingle(input_id);
+
+        INDArray output_f = g_model_2.outputSingle(gen1_out);
+
+        INDArray gen2_out = g_model_2.outputSingle(input_id);
+        INDArray output_b = g_model_1.outputSingle(gen2_out);
+
+        // 모델 그래프 정의
+        GraphBuilder graph = new NeuralNetConfiguration.Builder()
+                .updater(new Nesterovs(0.0002, 0.5)) // Adam 옵티마이저
+                .graphBuilder()
+                .addInputs("input_gen", "input_id")
+                .setInputTypes(InputType.convolutional(height, width, channels), InputType.convolutional(height, width, channels))
+                .setOutputs("output_d", "output_id", "output_f", "output_b");
+
+        ComputationGraph model = new ComputationGraph(graph.build());
+        model.init();
+
+        return model;
+    }
+
+    private static void comb_ttn(int genA, int genB, int discA, int discB, int comp){
+        ComputationGraph GenA = Gen_(256, 256, 3, genA);
+        ComputationGraph GenB = Gen_(256, 256, 3, genB);
+        ComputationGraph DiscA = Disc_(256, 256, 3, discA);
+        ComputationGraph DiscB = Disc_(256, 256, 3, discB);
+        ComputationGraph Comp = define_composite_model(GenA, DiscA, GenB, 256, 256, 3);
+    }
+
+
 //    1def define_discriminator(image_shape):
 //	# weight initialization
 //	1init = RandomNormal(stddev=0.02)
