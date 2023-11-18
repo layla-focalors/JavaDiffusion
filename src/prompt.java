@@ -266,6 +266,12 @@ class CycleGAN{
 
         return model;
     }
+    void GetDiscSummary(int width, int height, int channels, int require){
+        ComputationGraph Disc = Disc_(width, height, channels, require);
+        System.out.println(Disc.summary());
+    }
+
+//    require는 0, 1 둘 중에 한 값만 입력
     private static ComputationGraph Disc_(int width, int height, int channels, int require){
         ComputationGraph DiscA = define_discriminator(width, height, channels);
         ComputationGraph DiscB = define_discriminator(width, height, channels);
