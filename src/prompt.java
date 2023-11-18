@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
+import javax.imageio.ImageIO;
 
 class CycleGAN_options {
     int width;
@@ -57,26 +58,24 @@ class CycleGAN_options {
     }
 }
 
-class ImageLoader{
-    public static List<BufferedImage> loadImages(String directoryPath) {
-        File directory = new File(directoryPath);
-        File[] files = directory.listFiles();
+
+class CycleGAN_GetDataset {
+    public static void CycleGAN_GetDataset(String dataset_name, String data_type){
+        File dir = new File("./public_dataset/" + dataset_name + "/" + data_type + "/");
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png")); // .jpg 또는 .png 확장자를 가진 파일만 선택
         List<BufferedImage> images = new ArrayList<>();
 
         if (files != null) {
             for (File file : files) {
                 try {
-                    images.add(ImageIO.read(file));
+                    BufferedImage img = ImageIO.read(file);
+                    images.add(img);
                 } catch (IOException e) {
-                    System.out.println("Error reading file " + file.getName());
+                    System.out.println("이미지 로드에 실패하였습니다.");
                 }
             }
         }
-        return images;
-
-class CycleGAN_GetDataset {
-    public static void CycleGAN_GetDataset(String dataset_name, String data_type){
-        List<BufferedImage> images = ImageLoader.loadImages("./public_dataset/" + dataset_name + "/" + data_type);
+        System.out.println(images);
     }
 }
 
@@ -92,6 +91,36 @@ class CycleGAN{
         System.out.println("Height : " + cgo.GetHeight());
         System.out.println("Buffer Size : " + cgo.GetBufferSize());
         System.out.println("Batch Size : " + cgo.GetBatchSize());
+        String dataset_name = "horse2zibra";
+        String data_type = "trainA";
+
+        File dir = new File("./public_dataset/" + dataset_name + "/" + data_type + "/");
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png")); // .jpg 또는 .png 확장자를 가진 파일만 선택
+        List<BufferedImage> images = new ArrayList<>();
+
+        if (files != null) {
+            for (File file : files) {
+                try {
+                    BufferedImage img = ImageIO.read(file);
+                    images.add(img);
+                } catch (IOException e) {
+                    System.out.println("이미지 로드에 실패하였습니다.");
+                }
+            }
+        }
+        System.out.println(images.get(10));
+        BufferedImage fx = images.get(10);
+        try {
+            File outputfile = new File("saved.png");
+            ImageIO.write(fx, "png", outputfile);
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+    private static void getLoader(String dataset_name, String data_type){
+        System.out.println("------ CycleGAN_getLoader -----");
+        CycleGAN_GetDataset cgds = new CycleGAN_GetDataset();
+        cgds.CycleGAN_GetDataset(dataset_name, data_type);
     }
 }
 
