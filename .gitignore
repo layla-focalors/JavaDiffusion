@@ -27,3 +27,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+
+#datapack
+dxdiag.txt
+log.txt
