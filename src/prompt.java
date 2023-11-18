@@ -48,6 +48,16 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
+import org.deeplearning4j.nn.conf.graph.ElementWiseVertex;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.impl.ActivationLReLU;
+import org.nd4j.linalg.activations.impl.ActivationRReLU;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 class CycleGAN_options {
     int width;
@@ -145,8 +155,8 @@ class Convolutions {
     public static ConvolutionLayer Conv2D(int filters, int strides, int padding, int width, int height, int shapes){
         System.out.println("Conv2D");
 //        Nchannels ( RGB = 3, GrayScale = 1 )
-        ConvolutionLayer layer = new ConvolutionLayer.Builder()
-                .nIn(3) // 이전 레이어의 출력 뉴런 수 또는 입력 채널 수
+        ConvolutionLayer layer = new ConvolutionLayer.Builder(new int[]{width, height}, new int[]{strides, strides})
+                .nIn(shapes) // 이전 레이어의 출력 뉴런 수 또는 입력 채널 수
                 .nOut(filters) // 필터의 수
                 .stride(strides, strides) // 스트라이드
                 .padding(padding, padding) // 패딩. 'same'은 입력과 출력의 크기를 동일하게 유지하므로 패딩을 1로 설정
@@ -202,20 +212,71 @@ class CycleGAN{
         InputType inputType = InputType.convolutional(height, width, shapes);
         return inputType;
     }
-    private static void define_discriminator(int width, int height, int shapes){
-//        init = RandomNormal(stddev=0.02)
-        WeightInit init = RandomNormal(0.02f);
-        InputType in_image = Input(width, height, shapes);
-        ConvolutionLayer d = Conv2D(64, 2, 1);
+    private static ComputationGraph define_discriminator(int width, int height, int channels){
+        WeightInit weightInit = RandomNormal(0.02f);
 
+        // 입력 레이어
+        InputType inputType = Input(width, height, channels);
+
+        // C64
+        ConvolutionLayer conv1 = Conv2D(64, 2, 1);
+        ActivationLReLU activation1 = LReLU(0.2);
+
+        // C128
+        ConvolutionLayer conv2 = Conv2D(128, 2, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation2 = LReLU(0.2);
+
+        // C256
+        ConvolutionLayer conv3 = Conv2D(256, 2, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation3 = LReLU(0.2);
+
+        // C512
+        ConvolutionLayer conv4 = Conv2D(512, 2, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation4 = LReLU(0.2);
+
+        // 두 번째 마지막 출력 레이어
+        ConvolutionLayer conv5 = Conv2D(512, 1, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation5 = LReLU(0.2);
+
+        // 패치 출력
+        ConvolutionLayer patch_out = Conv2D(1, 1, 1);
+
+        // 모델 정의
+        ComputationGraphConfiguration.GraphBuilder graph = new NeuralNetConfiguration.Builder()
+                .updater(new Nesterovs(0.0002, 0.5)) // Adam 옵티마이저
+                .graphBuilder()
+                .addInputs("input")
+                .setInputTypes(inputType)
+                .addLayer("conv1", conv1, "input")
+                .addVertex("activation1", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv1")
+                .addLayer("conv2", conv2, "activation1")
+                .addVertex("activation2", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv2")
+                .addLayer("conv3", conv3, "activation2")
+                .addVertex("activation3", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv3")
+                .addLayer("conv4", conv4, "activation3")
+                .addVertex("activation4", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv4")
+                .addLayer("conv5", conv5, "activation4")
+                .addVertex("activation5", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv5")
+                .addLayer("patch_out", patch_out, "activation5")
+                .setOutputs("patch_out");
+
+        // 모델 컴파일
+        ComputationGraph model = new ComputationGraph(graph.build());
+        model.init();
+
+        return model;
     }
-//    def define_discriminator(image_shape):
+//    1def define_discriminator(image_shape):
 //	# weight initialization
-//	init = RandomNormal(stddev=0.02)
+//	1init = RandomNormal(stddev=0.02)
 //	# source image input
-//	in_image = Input(shape=image_shape)
+//	1in_image = Input(shape=image_shape)
 //	# C64
-//	d = Conv2D(64, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(in_image)
+//	1d = Conv2D(64, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(in_image)
 //	d = LeakyReLU(alpha=0.2)(d)
 //	# C128
 //	d = Conv2D(128, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(d)
