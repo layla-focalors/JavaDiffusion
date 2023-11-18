@@ -1,68 +1,35 @@
-import org.deeplearning4j.nn.conf.graph.MergeVertex;
-import org.w3c.dom.Text;
-
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Scanner;
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.io.InputStreamReader;
-import java.io.File;import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import javax.imageio.ImageIO;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.activations.impl.ActivationLReLU;
-import org.deeplearning4j.nn.conf.layers.BatchNormalization;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.learning.config.Nesterovs;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.graph.ElementWiseVertex;
+import org.deeplearning4j.nn.conf.graph.MergeVertex;
+import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.layers.BatchNormalization;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.activations.impl.ActivationLReLU;
 import org.nd4j.linalg.activations.impl.ActivationRReLU;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
-import org.deeplearning4j.nn.conf.graph.ElementWiseVertex;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.nd4j.linalg.activations.impl.ActivationRReLU;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 class CycleGAN_options {
     int width;
@@ -175,7 +142,6 @@ class Convolutions {
 class CycleGAN{
     public static void CycleGAN(String filepath, String Model_number){
         System.out.println("CycleGAN");
-        CycleGAN_TRAIN();
     }
     private static ActivationLReLU LReLU(double alpha){
         System.out.println("LReLU");
@@ -288,24 +254,98 @@ class CycleGAN{
         return null;
     }
 
-    private static void resney_block(int n_filters, String input_layer, GraphBuilder graph){
+    private static void resnet_block(int n_filters, String input_layer, GraphBuilder graph){
         WeightInit weightInit = RandomNormal(0.02f);
 
         // 첫 번째 컨볼루션 레이어
         ConvolutionLayer conv1 = Conv2D(n_filters, 1, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation1 = LReLU(0.2);
 
         // 두 번째 컨볼루션 레이어
         ConvolutionLayer conv2 = Conv2D(n_filters, 1, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
 
         // 입력 레이어와 채널 방향으로 병합
         graph.addLayer("conv1", conv1, input_layer)
                 .addVertex("activation1", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv1")
                 .addLayer("conv2", conv2, "activation1")
                 .addVertex("merge", new MergeVertex(), "conv2", input_layer);
+    }
+
+    private static ComputationGraph define_generator(int width, int height, int channels, int n_resnet){
+        WeightInit weightInit = RandomNormal(0.02f);
+
+        // 이미지 입력
+        InputType inputType = Input(width, height, channels);
+
+        // 모델 정의
+        GraphBuilder graph = new NeuralNetConfiguration.Builder()
+                .updater(new Nesterovs(0.0002, 0.5)) // Adam 옵티마이저
+                .graphBuilder()
+                .addInputs("input")
+                .setInputTypes(inputType);
+
+        // 첫 번째 컨볼루션 레이어
+        ConvolutionLayer conv1 = Conv2D(64, 1, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation1 = LReLU(0.2);
+
+        graph.addLayer("conv1", conv1, "input")
+                .addVertex("activation1", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv1");
+
+        // d128
+        ConvolutionLayer conv2 = Conv2D(128, 2, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation2 = LReLU(0.2);
+
+        graph.addLayer("conv2", conv2, "activation1")
+                .addVertex("activation2", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv2");
+
+        // d256
+        ConvolutionLayer conv3 = Conv2D(256, 2, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation3 = LReLU(0.2);
+
+        graph.addLayer("conv3", conv3, "activation2")
+                .addVertex("activation3", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv3");
+
+        // R256
+        String lastLayerId = "activation3";
+        for (int i = 0; i < n_resnet; i++) {
+            resnet_block(256, lastLayerId, graph);
+            lastLayerId = "merge" + i;
         }
+
+        // u128
+        Deconvolution2D deconv1 = Deconv2D(128, 2, 1);
+        ActivationLReLU activation4 = LReLU(0.2);
+
+        graph.addLayer("deconv1", deconv1, lastLayerId)
+                .addVertex("activation4", new ElementWiseVertex(ElementWiseVertex.Op.Add), "deconv1");
+
+        // u64
+        Deconvolution2D deconv2 = Deconv2D(64, 2, 1);
+        ActivationLReLU activation5 = LReLU(0.2);
+
+        graph.addLayer("deconv2", deconv2, "activation4")
+                .addVertex("activation5", new ElementWiseVertex(ElementWiseVertex.Op.Add), "deconv2");
+
+        // 마지막 컨볼루션 레이어
+        ConvolutionLayer conv4 = Conv2D(3, 1, 1);
+        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
+        ActivationLReLU activation6 = LReLU(0.2);
+
+        graph.addLayer("conv4", conv4, "activation5")
+                .addVertex("activation6", new ElementWiseVertex(ElementWiseVertex.Op.Add), "conv4");
+
+        // 출력 이미지
+        graph.setOutputs("activation6");
+
+        // 모델 컴파일
+        ComputationGraph model = new ComputationGraph(graph.build());
+        model.init();
+
+        return model;
+    }
 //    1def define_discriminator(image_shape):
 //	# weight initialization
 //	1init = RandomNormal(stddev=0.02)
