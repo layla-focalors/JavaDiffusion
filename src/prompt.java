@@ -15,7 +15,7 @@ public class prompt {
         boolean isexit = false;
 //        모델 이름과 주소 저장
         String model_Name;
-        String fileURL = "https://github.com/layla-focalors/JavaDiffusion/blob/main/models/";
+        String fileURL = "https://github.com/layla-focalors/JavaDiffusion/releases/download/download/";
 //        isexit 객체를 사용해 프로그램의 종료 여부를 판단
         Scanner sc = new Scanner(System.in);
 //        sc를 통해 스캐너 객체 생성
