@@ -1,5 +1,6 @@
 import org.w3c.dom.Text;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,10 +14,84 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.io.InputStreamReader;
 import java.io.File;import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+import java.util.Vector;
 
-class CycleGAN {
+class CycleGAN_options {
+    int width;
+    int height;
+    int buffer_size;
+    int batch_size;
+    void SetWidth(int _width){
+        this.width = _width;
+    }
+    void SetHeight(int _height){
+        this.height = _height;
+    }
+    void SetBufferSize(int _buffer_size){
+        this.buffer_size = _buffer_size;
+    }
+    void SetBatchSize(int _batch_size){
+        this.batch_size = _batch_size;
+    }
+    CycleGAN_options(int _width, int _height, int _buffer_size, int _batch_size){
+        this.width = _width;
+        this.height = _height;
+        this.buffer_size = _buffer_size;
+        this.batch_size = _batch_size;
+    }
+    int GetWidth(){
+        return this.width;
+    }
+    int GetHeight(){
+        return this.height;
+    }
+    int GetBufferSize(){
+        return this.buffer_size;
+    }
+    int GetBatchSize(){
+        return this.batch_size;
+    }
+}
+
+class ImageLoader{
+    public static List<BufferedImage> loadImages(String directoryPath) {
+        File directory = new File(directoryPath);
+        File[] files = directory.listFiles();
+        List<BufferedImage> images = new ArrayList<>();
+
+        if (files != null) {
+            for (File file : files) {
+                try {
+                    images.add(ImageIO.read(file));
+                } catch (IOException e) {
+                    System.out.println("Error reading file " + file.getName());
+                }
+            }
+        }
+        return images;
+
+class CycleGAN_GetDataset {
+    public static void CycleGAN_GetDataset(String dataset_name, String data_type){
+        List<BufferedImage> images = ImageLoader.loadImages("./public_dataset/" + dataset_name + "/" + data_type);
+    }
+}
+
+class CycleGAN{
     public static void CycleGAN(String filepath, String Model_number){
         System.out.println("CycleGAN");
+        CycleGAN_TRAIN();
+    }
+    private static void CycleGAN_TRAIN(){
+        System.out.println("------ CycleGAN_TrainOPTIONS -----");
+        CycleGAN_options cgo = new CycleGAN_options(256, 256, 400, 1);
+        System.out.println("Width : " + cgo.GetWidth());
+        System.out.println("Height : " + cgo.GetHeight());
+        System.out.println("Buffer Size : " + cgo.GetBufferSize());
+        System.out.println("Batch Size : " + cgo.GetBatchSize());
     }
 }
 
@@ -292,9 +367,10 @@ public class prompt {
                     int valuesx = cmk.nextInt();
                     if(valuesx == 1){
                         System.out.println("-------- CycleGAN ---------");
-                        System.out.println("이미지를 생성하기 위해 모델을 선택해주세요!");
+                        System.out.println("이미지를 생성할 모델을 선택해주세요!");
                         System.out.println("1. Anime Model ( Genshin Impact Style ) ");
-                        System.out.println("2. action Model ( City Style ) ");
+                        System.out.println("2. nor2snow Model ( Winter Style )");
+                        System.out.println("3. Horse2Zibra Model ( Horse Style ) ");
                         Scanner mxu = new Scanner(System.in);
                         int core_x = mxu.nextInt();
                         switch(core_x){
@@ -305,9 +381,15 @@ public class prompt {
                                 System.out.println("이미지 생성이 완료되었습니다. ( Image Create Complete )");
                             }
                             case 2 -> {
-                                System.out.println("-------- Action Model ---------");
+                                System.out.println("-------- Nor2snow Model ---------");
                                 CycleGAN cg = new CycleGAN();
                                 cg.CycleGAN("Action.png", "2");
+                                System.out.println("이미지 생성이 완료되었습니다. ( Image Create Complete )");
+                            }
+                            case 3 -> {
+                                System.out.println("-------- Horse2Zibra Model ---------");
+                                CycleGAN cg = new CycleGAN();
+                                cg.CycleGAN("Horse.png", "3");
                                 System.out.println("이미지 생성이 완료되었습니다. ( Image Create Complete )");
                             }
                             default -> {
