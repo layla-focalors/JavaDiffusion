@@ -14,9 +14,16 @@ import java.io.File;import java.io.IOException;
 
 class IsFiles {
     public static void IsExists(String Filename){
+        Searcher(Filename);
+    }
+    static void IsExits2(String Filename){
+        Searcher(Filename);
+    }
+
+    private static void Searcher(String Filename) {
         String filePath = "./data/is" + Filename + ".txt";
         System.out.println("파일 경로 : " + filePath);
-        File file = new File(Filename);
+        File file = new File(filePath);  // 파일의 전체 경로를 사용합니다.
         if(file.exists()){
             System.out.println("파일이 존재합니다.");
         }else {
