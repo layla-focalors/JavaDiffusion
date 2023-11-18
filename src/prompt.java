@@ -14,6 +14,12 @@ import java.nio.file.StandardCopyOption;
 import java.io.InputStreamReader;
 import java.io.File;import java.io.IOException;
 
+class CycleGAN {
+    public static void CycleGAN(String filepath, String Model_number){
+        System.out.println("CycleGAN");
+    }
+}
+
 class Diffusion {
 //    안될 것 같으면 CycleGAN으로 선회
     public static void Diffusion(String prompt, int batch_size){
@@ -285,8 +291,31 @@ public class prompt {
                     System.out.print("모델을 선택해주세요! : ");
                     int valuesx = cmk.nextInt();
                     if(valuesx == 1){
-
+                        System.out.println("-------- CycleGAN ---------");
+                        System.out.println("이미지를 생성하기 위해 모델을 선택해주세요!");
+                        System.out.println("1. Anime Model ( Genshin Impact Style ) ");
+                        System.out.println("2. action Model ( City Style ) ");
+                        Scanner mxu = new Scanner(System.in);
+                        int core_x = mxu.nextInt();
+                        switch(core_x){
+                            case 1 -> {
+                                System.out.println("-------- Anime Model ---------");
+                                CycleGAN cg = new CycleGAN();
+                                cg.CycleGAN("Anime.png", "1");
+                                System.out.println("이미지 생성이 완료되었습니다. ( Image Create Complete )");
+                            }
+                            case 2 -> {
+                                System.out.println("-------- Action Model ---------");
+                                CycleGAN cg = new CycleGAN();
+                                cg.CycleGAN("Action.png", "2");
+                                System.out.println("이미지 생성이 완료되었습니다. ( Image Create Complete )");
+                            }
+                            default -> {
+                                System.out.println("잘못된 입력입니다. ( Wrong Input )");
+                            }
+                        }
                     }else if(valuesx == 2){
+                        System.out.println("---- JVM - StableDiffusion -----");
                         System.out.println("이미지 생성을 위해 다음의 답변에 답해주세요!");
                         System.out.print("이미지 생성을 Java Models 를 통해 진행하시겠습니까? (yes/no) : ");
                         Scanner scu = new Scanner(System.in);
