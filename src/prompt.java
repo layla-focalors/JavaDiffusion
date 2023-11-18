@@ -44,7 +44,10 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 
 class CycleGAN_options {
     int width;
@@ -139,7 +142,7 @@ class Model_Activation {
 
 class Convolutions {
 //    (64, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(in_image)
-    public static ConvolutionLayer Conv2D(int filters, int strides, int padding){
+    public static ConvolutionLayer Conv2D(int filters, int strides, int padding, int width, int height, int shapes){
         System.out.println("Conv2D");
 //        Nchannels ( RGB = 3, GrayScale = 1 )
         ConvolutionLayer layer = new ConvolutionLayer.Builder()
@@ -158,6 +161,87 @@ class CycleGAN{
     public static void CycleGAN(String filepath, String Model_number){
         System.out.println("CycleGAN");
         CycleGAN_TRAIN();
+    }
+    private static ActivationLReLU LReLU(double alpha){
+        System.out.println("LReLU");
+        return new ActivationLReLU(alpha);
+    }
+    private static ConvolutionLayer Conv2D(int filters, int strides, int padding){
+        System.out.println("Conv2D");
+//        Nchannels ( RGB = 3, GrayScale = 1 )
+        ConvolutionLayer layer = new ConvolutionLayer.Builder()
+                .nIn(3) // 이전 레이어의 출력 뉴런 수 또는 입력 채널 수
+                .nOut(filters) // 필터의 수
+                .stride(strides, strides) // 스트라이드
+                .padding(padding, padding) // 패딩. 'same'은 입력과 출력의 크기를 동일하게 유지하므로 패딩을 1로 설정
+                .weightInit(WeightInit.RELU) // 가중치 초기화. Keras의 'init'에 해당
+                .activation(Activation.LEAKYRELU) // 활성화 함수.
+                .build();
+        return layer;
+    }
+    private static MultiLayerNetwork Model_Compile(float learning_late, float beta1){
+        MultiLayerNetwork model = new MultiLayerNetwork(new NeuralNetConfiguration.Builder()
+                .weightInit(WeightInit.XAVIER)
+                .activation(Activation.RELU)
+                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+                .updater(new Nesterovs(learning_late, beta1))
+                .list()
+                .layer(0, new DenseLayer.Builder().nIn(10).nOut(10).build())
+                .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.MSE).nIn(10).nOut(10).build())
+                .build());
+        model.init();
+        return model;
+    }
+    private static WeightInit RandomNormal(float stddev){
+        long seed = 1111;
+        Nd4j.getRandom().setSeed(seed);
+        WeightInit weightInit = WeightInit.XAVIER;
+        return weightInit;
+    }
+    private static InputType Input(int width, int height, int shapes){
+        InputType inputType = InputType.convolutional(height, width, shapes);
+        return inputType;
+    }
+    private static void define_discriminator(int width, int height, int shapes){
+//        init = RandomNormal(stddev=0.02)
+        WeightInit init = RandomNormal(0.02f);
+        InputType in_image = Input(width, height, shapes);
+        ConvolutionLayer d = Conv2D(64, 2, 1);
+
+    }
+//    def define_discriminator(image_shape):
+//	# weight initialization
+//	init = RandomNormal(stddev=0.02)
+//	# source image input
+//	in_image = Input(shape=image_shape)
+//	# C64
+//	d = Conv2D(64, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(in_image)
+//	d = LeakyReLU(alpha=0.2)(d)
+//	# C128
+//	d = Conv2D(128, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(d)
+//	d = InstanceNormalization(axis=-1)(d)
+//	d = LeakyReLU(alpha=0.2)(d)
+//	# C256
+//	d = Conv2D(256, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(d)
+//	d = InstanceNormalization(axis=-1)(d)
+//	d = LeakyReLU(alpha=0.2)(d)
+//	# C512
+//	d = Conv2D(512, (4,4), strides=(2,2), padding='same', kernel_initializer=init)(d)
+//	d = InstanceNormalization(axis=-1)(d)
+//	d = LeakyReLU(alpha=0.2)(d)
+//	# second last output layer
+//	d = Conv2D(512, (4,4), padding='same', kernel_initializer=init)(d)
+//	d = InstanceNormalization(axis=-1)(d)
+//	d = LeakyReLU(alpha=0.2)(d)
+//	# patch output
+//	patch_out = Conv2D(1, (4,4), padding='same', kernel_initializer=init)(d)
+//	# define model
+//	model = Model(in_image, patch_out)
+//	# compile model
+//	model.compile(loss='mse', optimizer=Adam(lr=0.0002, beta_1=0.5), loss_weights=[0.5])
+//	return model
+    private static void ModelTrain(int image_width, int image_height, int colormap){
+
     }
     private static void CycleGAN_TRAIN(){
         System.out.println("------ CycleGAN_TrainOPTIONS -----");
