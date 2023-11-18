@@ -9,6 +9,7 @@ text_encoder = CLIPTextModel.from_pretrained(model_id, subfolder="text_encoder",
 vae = AutoencoderKL.from_pretrained(model_id, subfolder="vae", torchscript=True, return_dict=False)
 unet_model = UNet2DConditionModel.from_pretrained(model_id, subfolder="unet", torchscript=True, return_dict=False)
 tokenizer = AutoTokenizer.from_pretrained(model_id, subfolder="tokenizer")
+print(scheduler, text_encoder, unet_model, tokenizer)
 
 vae.eval()
 unet_model.eval()
@@ -18,6 +19,8 @@ prompt = "Astronaut riding a horse"
 tokenized = tokenizer(prompt,
                       padding="max_length", max_length=tokenizer.model_max_length,
                       truncation=True, return_tensors="pt")
+
+print(tokenized)
 
 text_embeddings = text_encoder(**tokenized)
 traced_text = torch.jit.trace(text_encoder, (tokenized["input_ids"], tokenized['attention_mask']))
@@ -43,7 +46,7 @@ def encode(self, x: torch.FloatTensor):
 def decode(self, z: torch.FloatTensor, return_dict: bool = False):
     return AutoencoderKL.decode(self, z, return_dict)
 
-
+print(vae)
 vae.encode = encode.__get__(vae, AutoencoderKL)
 vae.decode = decode.__get__(vae, AutoencoderKL)
 traced_vae = torch.jit.trace_module(vae, {"encode": [torch.ones((1, 3, 512, 512), dtype=torch.float32)],
