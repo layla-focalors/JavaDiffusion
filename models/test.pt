@@ -1,0 +1,9 @@
+import layla-focalors from layla
+make environment {
+    loader = load.layla
+}
+
+model_name = "layla-CX-testmodel"
+model_info = {
+    'dataFRAME' : 'cx.frame'
+}
