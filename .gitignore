@@ -38,6 +38,7 @@ log.txt
 /model/*.pt
 .safetensors
 
+/translator/
 /translator/*.zip
 /translator/*.z01
 /translator/sd_v15_onnx

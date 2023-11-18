@@ -24,10 +24,11 @@ text_embeddings = text_encoder(**tokenized)
 latents = torch.randn((1, 4, 64, 64))
 latent_model_input = torch.cat([latents] * 2)
 text_embeddings = torch.stack([text_embeddings[0], text_embeddings[0]]).squeeze()
+traced_text = torch.jit.trace(text_encoder, (tokenized["input_ids"], tokenized['attention_mask']))
 
 def forward(self, sample, timestep, encoder_hidden_states,
             class_labels=None, return_dict: bool = False, ):
-    return UNet2DConditionModel.forward(self, sample, timestep, encoder_hidden_states, class_labels, return_dict)
+    return self.forward(self, sample, timestep, encoder_hidden_states, class_labels, return_dict)
 
 unet_model.forward = forward.__get__(unet_model, UNet2DConditionModel)
 scripted_unet = torch.jit.script(unet_model)
@@ -37,7 +38,7 @@ def encode(self, x: torch.FloatTensor):
     return self.quant_conv(h)
 
 def decode(self, z: torch.FloatTensor, return_dict: bool = False):
-    return AutoencoderKL.decode(self, z, return_dict)
+    return self.decode(self, z, return_dict)
 
 vae.encode = encode.__get__(vae, AutoencoderKL)
 vae.decode = decode.__get__(vae, AutoencoderKL)
