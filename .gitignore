@@ -34,3 +34,6 @@ dxdiag.txt
 log.txt
 
 /model/*.pt
+.safetensors
+
+/translator/sd_v15_onnx
