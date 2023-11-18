@@ -342,6 +342,18 @@ class CycleGAN{
 
         return model;
     }
+
+//    SELECTOR를 이용해서 생성자 여러 개를 동시 생성
+    private static ComputationGraph Gen_(int width, int height, int channels, int selector) {
+        if (selector == 1) {
+            ComputationGraph GenA = define_generator(width, height, channels, 9);
+            return GenA;
+        } else if (selector == 2) {
+            ComputationGraph GenB = define_generator(width, height, channels, 9);
+            return GenB;
+        }
+        return null;
+    }
 //    1def define_discriminator(image_shape):
 //	# weight initialization
 //	1init = RandomNormal(stddev=0.02)
