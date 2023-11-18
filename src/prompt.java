@@ -224,22 +224,18 @@ class CycleGAN{
 
         // C128
         ConvolutionLayer conv2 = Conv2D(128, 2, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation2 = LReLU(0.2);
 
         // C256
         ConvolutionLayer conv3 = Conv2D(256, 2, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation3 = LReLU(0.2);
 
         // C512
         ConvolutionLayer conv4 = Conv2D(512, 2, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation4 = LReLU(0.2);
 
         // 두 번째 마지막 출력 레이어
         ConvolutionLayer conv5 = Conv2D(512, 1, 1);
-        // InstanceNormalization은 DL4J에서 지원하지 않습니다.
         ActivationLReLU activation5 = LReLU(0.2);
 
         // 패치 출력
