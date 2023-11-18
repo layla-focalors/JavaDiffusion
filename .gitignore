@@ -32,3 +32,5 @@ bin/
 #datapack
 dxdiag.txt
 log.txt
+
+/model/*.pt
