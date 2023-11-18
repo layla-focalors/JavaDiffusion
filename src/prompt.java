@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public class prompt {
@@ -19,7 +23,23 @@ public class prompt {
             switch(value){
 //                -> 를 사용한 switch 문은 break가 필요하지 않음
                 case 1 -> {
-                    System.out.println("Get System Info");
+                    System.out.println("Get System Info - Using dxdiag");
+                    try {
+                        String filePath = "./dxdiag.txt";
+                        ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "dxdiag", "/t", filePath);
+                        Process p = pb.start();
+                        p.waitFor();
+
+                        BufferedReader br = new BufferedReader(new FileReader(filePath));
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            if (line.trim().startsWith("Card name:") || line.trim().startsWith("Current Mode:")) {
+                                System.out.println(line.trim());
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.out.println("에러가 발생하였습니다. 시스템에 GPU 자원이 존재하는지 확인하세요.");
+                    }
                 }
                 case 2 -> {
                     System.out.println("Create Image");
