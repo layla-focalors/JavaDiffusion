@@ -266,6 +266,16 @@ class CycleGAN{
 
         return model;
     }
+    private static ComputationGraph Disc_(int width, int height, int channels, int require){
+        ComputationGraph DiscA = define_discriminator(width, height, channels);
+        ComputationGraph DiscB = define_discriminator(width, height, channels);
+        if(require == 1){
+            return DiscA;
+        }else if(require == 2){
+            return DiscB;
+        }
+        return null;
+    }
 //    1def define_discriminator(image_shape):
 //	# weight initialization
 //	1init = RandomNormal(stddev=0.02)
