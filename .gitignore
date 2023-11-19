@@ -38,6 +38,8 @@ log.txt
 /model/*.pt
 .safetensors
 
+/net.artsnoa.com.rmd/
+
 /translator/
 /translator/*.zip
 /translator/*.z01
