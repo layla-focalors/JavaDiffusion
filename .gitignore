@@ -38,7 +38,10 @@ log.txt
 /model/*.pt
 .safetensors
 
+cik.java
+
 /net.artsnoa.com.rmd/
+/net/artsnoa/com/rmd/
 
 /translator/
 /translator/*.zip
